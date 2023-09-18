@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Drawing</title>
+    <title>Canvas Chart</title>
 </head>
 <body>
-<h1>Canvas Drawing</h1>
+<h1>Canvas Chart with Calculator Selection</h1>
 
-<!-- Canvas for kilometer per hour to meter per second -->
-<canvas id="canvas1" width="400" height="200"></canvas>
-<h2>Kilometers per Hour to Meters per Second</h2>
+<label for="calculatorDropdown">Select Calculator:</label>
+<select id="calculatorDropdown">
+    <option value="inchesToCm">Inches to Centimeters</option>
+</select>
 
-<!-- Canvas for resistance power calculation -->
-<canvas id="canvas2" width="400" height="200"></canvas>
-<h2>Resistance Power Calculation</h2>
+<canvas id="canvas" width="400" height="300"></canvas>
 
 <script src="index.js"></script>
 </body>

@@ -1,72 +1,82 @@
-var KilometersPerHourToMetersPerSecond = /** @class */ (function () {
-    function KilometersPerHourToMetersPerSecond() {
+var InchesToCm = /** @class */ (function () {
+    function InchesToCm() {
     }
-    KilometersPerHourToMetersPerSecond.prototype.calculate = function (kmPerHour) {
-        return kmPerHour * (1000 / 3600);
+    InchesToCm.prototype.calculate = function (inches) {
+        return inches * 2.54;
     };
-    KilometersPerHourToMetersPerSecond.prototype.inputUnit = function () {
-        return "km/h";
+    InchesToCm.prototype.inputUnit = function () {
+        return "in";
     };
-    KilometersPerHourToMetersPerSecond.prototype.outputUnit = function () {
-        return "m/s";
+    InchesToCm.prototype.outputUnit = function () {
+        return "cm";
     };
-    return KilometersPerHourToMetersPerSecond;
-}());
-var ResistancePowerCalculator = /** @class */ (function () {
-    function ResistancePowerCalculator(resistance) {
-        this.resistance = resistance;
-    }
-    ResistancePowerCalculator.prototype.calculate = function (voltage) {
-        var current = voltage / this.resistance;
-        return voltage * current;
-    };
-    ResistancePowerCalculator.prototype.inputUnit = function () {
-        return "V";
-    };
-    ResistancePowerCalculator.prototype.outputUnit = function () {
-        return "W";
-    };
-    return ResistancePowerCalculator;
+    return InchesToCm;
 }());
 var Figure = /** @class */ (function () {
     function Figure(calculator, g) {
-        this.calculator = calculator;
         this.g = g;
-        this.draw();
+        this.calculator = calculator;
     }
+    // Create a method to update the calculator
+    Figure.prototype.setCalculator = function (calculator) {
+        this.calculator = calculator;
+    };
     Figure.prototype.draw = function () {
         this.g.clearRect(0, 0, this.g.canvas.width, this.g.canvas.height);
-        for (var i = 0; i < 25; i++) {
-            // Adjust the y-coordinate to draw from top to bottom
-            var y = this.g.canvas.height - 10 * this.calculator.calculate(i);
-            this.g.fillRect(10 * i, y, 3, 3);
+        this.g.beginPath();
+        this.g.moveTo(0, this.g.canvas.height);
+        this.g.lineTo(this.g.canvas.width, this.g.canvas.height);
+        this.g.moveTo(0, 0);
+        this.g.lineTo(0, this.g.canvas.height);
+        this.g.stroke();
+        for (var i = 0; i <= 20; i += 2) {
+            var x = 10 * i;
+            var y = this.g.canvas.height;
+            this.g.beginPath();
+            this.g.moveTo(x, y);
+            this.g.lineTo(x, y - 5);
+            this.g.stroke();
+            this.g.fillText(i + "", x, y + 15);
+            var value = this.calculator.calculate(i);
+            this.g.fillText(value.toFixed(1), x - 15, y - 3 * value);
+            this.g.beginPath();
+            this.g.moveTo(x, y);
+            this.g.lineTo(x + 5, y);
+            this.g.stroke();
         }
+        this.g.fillText("X-axis (" + this.calculator.inputUnit() + ")", this.g.canvas.width - 40, this.g.canvas.height + 20);
+        this.g.save();
+        this.g.translate(-50, this.g.canvas.height / 2);
+        this.g.rotate(-Math.PI / 2);
+        this.g.fillText("Y-axis (" + this.calculator.outputUnit() + ")", 0, 0);
+        this.g.restore();
+        this.g.beginPath();
+        for (var i = 0; i <= 20; i += 2) {
+            var x = 10 * i;
+            var y = this.g.canvas.height - 3 * this.calculator.calculate(i);
+            this.g.lineTo(x, y);
+            this.g.fillRect(x - 2, y - 2, 4, 4);
+        }
+        this.g.stroke();
     };
     return Figure;
 }());
-document.addEventListener("DOMContentLoaded", function () {
-    var kmPerHourToMPerSecCalculator = new KilometersPerHourToMetersPerSecond();
-    var speedInKmPerHour = 60; // Replace with your desired speed in km/h
-    var metersPerSecond = kmPerHourToMPerSecCalculator.calculate(speedInKmPerHour);
-    var canvas1 = document.getElementById("canvas1");
-    var context1 = canvas1.getContext("2d");
-    if (context1) {
-        var figure1 = new Figure(kmPerHourToMPerSecCalculator, context1);
-        figure1.draw(); // Draw the result on canvas1
-    }
-    else {
-        console.error("Canvas rendering context is not available for canvas1.");
-    }
-    var resistancePowerCalculator = new ResistancePowerCalculator(100);
-    var voltage = 12; // Replace with your desired voltage in volts
-    var power = resistancePowerCalculator.calculate(voltage);
-    var canvas2 = document.getElementById("canvas2");
-    var context2 = canvas2.getContext("2d");
-    if (context2) {
-        var figure2 = new Figure(resistancePowerCalculator, context2);
-        figure2.draw(); // Draw the result on canvas2
-    }
-    else {
-        console.error("Canvas rendering context is not available for canvas2.");
-    }
-});
+var inchesToCmCalculator = new InchesToCm();
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext("2d");
+if (context) {
+    var figure_1 = new Figure(inchesToCmCalculator, context);
+    figure_1.draw(); // Draw the initial chart
+    // Add a dropdown menu to switch calculators
+    var calculatorDropdown_1 = document.getElementById("calculatorDropdown");
+    calculatorDropdown_1.addEventListener("change", function () {
+        if (calculatorDropdown_1.value === "inchesToCm") {
+            var inchesToCmCalculator_1 = new InchesToCm();
+            figure_1.setCalculator(inchesToCmCalculator_1);
+            figure_1.draw();
+        }
+    });
+}
+else {
+    console.error("Canvas rendering context is not available.");
+}
