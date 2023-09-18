@@ -1,51 +1,60 @@
-interface CalculatingFunction {
-    calculate(x: number): number;
-    inputUnit(): string;
-    outputUnit(): string;
-}
+let calculationCount: { [key: string]: number } = {
+    inchesToCm: 0,
+    cmToInches: 0,
+    kmPerHourToMPerSec: 0,
+    mPerSecToKmPerHour: 0
+};
 
-class InchesToCm implements CalculatingFunction {
+class InchesToCm {
     calculate(inches: number): number {
         return inches * 2.54;
     }
-    inputUnit(): string {
-        return "in";
-    }
-    outputUnit(): string {
-        return "cm";
+}
+
+class CmToInches {
+    calculate(cm: number): number {
+        return cm / 2.54;
     }
 }
 
-class SpeedConverter implements CalculatingFunction {
-    private inputUnitStr: string;
-    private outputUnitStr: string;
-    private coefficient: number;
+function convert() {
+    const inputValue = parseFloat((document.getElementById("inputValue") as HTMLInputElement).value);
+    const converterSelect = document.getElementById("converterSelect") as HTMLSelectElement;
+    const selectedConverter = converterSelect.value;
+    let result = 0;
 
-    constructor(inputUnit: string, outputUnit: string, coefficient: number) {
-        this.inputUnitStr = inputUnit;
-        this.outputUnitStr = outputUnit;
-        this.coefficient = coefficient;
+    switch (selectedConverter) {
+        case "inchesToCm":
+            result = new InchesToCm().calculate(inputValue);
+            calculationCount.inchesToCm++;
+            break;
+        case "cmToInches":
+            result = new CmToInches().calculate(inputValue);
+            calculationCount.cmToInches++;
+            break;
+        case "kmPerHourToMPerSec":
+            result = inputValue * (1000 / 3600);
+            calculationCount.kmPerHourToMPerSec++;
+            break;
+        case "mPerSecToKmPerHour":
+            result = inputValue * (3600 / 1000);
+            calculationCount.mPerSecToKmPerHour++;
+            break;
+        default:
+            alert("Invalid converter selection.");
+            break;
     }
 
-    calculate(value: number): number {
-        return value * this.coefficient;
-    }
-
-    inputUnit(): string {
-        return this.inputUnitStr;
-    }
-
-    outputUnit(): string {
-        return this.outputUnitStr;
-    }
+    document.getElementById("result")!.textContent = result.toFixed(2);
+    updateCalculationCount();
 }
 
-const inchesToCmConverter = new InchesToCm();
-const inchesValue = 10;
-const cmValue = inchesToCmConverter.calculate(inchesValue);
-console.log(`${inchesValue} ${inchesToCmConverter.inputUnit()} = ${cmValue} ${inchesToCmConverter.outputUnit()}`);
+function updateCalculationCount() {
+    const calculationCountElement = document.getElementById("calculationCount");
+    calculationCountElement!.textContent = Object.keys(calculationCount).map(key => `${key}: ${calculationCount[key]}`).join(', ');
+}
 
-const kmPerHourToMPerSecConverter = new SpeedConverter("km/h", "m/s", 1000 / 3600);
-const kmPerHourValue = 60;
-const mPerSecValue = kmPerHourToMPerSecConverter.calculate(kmPerHourValue);
-console.log(`${kmPerHourValue} ${kmPerHourToMPerSecConverter.inputUnit()} = ${mPerSecValue} ${kmPerHourToMPerSecConverter.outputUnit()}`);
+const convertButton = document.getElementById("convertButton");
+if (convertButton) {
+    convertButton.addEventListener("click", convert);
+}
