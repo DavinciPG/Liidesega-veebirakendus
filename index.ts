@@ -4,102 +4,77 @@ interface CalculatingFunction {
     outputUnit(): string;
 }
 
-class CmToInches implements CalculatingFunction {
-    calculate(cm: number): number {
-        return cm / 2.54;
+class KilometersPerHourToMetersPerSecond implements CalculatingFunction {
+    calculate(kmPerHour: number): number {
+        return kmPerHour * (1000 / 3600);
     }
     inputUnit(): string {
-        return "cm";
+        return "km/h";
     }
     outputUnit(): string {
-        return "in";
+        return "m/s";
     }
 }
 
-class InchesToCm implements CalculatingFunction {
-    calculate(inches: number): number {
-        return inches * 2.54;
-    }
-    inputUnit(): string {
-        return "in";
-    }
-    outputUnit(): string {
-        return "cm";
-    }
-}
+class ResistancePowerCalculator implements CalculatingFunction {
+    constructor(private resistance: number) {}
 
-class AXplusB implements CalculatingFunction {
-    constructor(
-        protected coefficient: number,
-        protected intercept: number,
-        protected inputUnitType: string,
-        protected outputUnitType: string
-    ) {}
-    calculate(x: number): number {
-        return this.coefficient * x + this.intercept;
-    }
-    inputUnit(): string {
-        return this.inputUnitType;
-    }
-    outputUnit(): string {
-        return this.outputUnitType;
-    }
-}
-
-const taxiFareCalculator = new AXplusB(2.5, 5, "km", "EUR");
-const distanceKm = 10;
-const fare = taxiFareCalculator.calculate(distanceKm);
-console.log(`Taxi fare for ${distanceKm} km: ${fare} EUR`);
-
-const celsiusToFahrenheit = new AXplusB(9 / 5, 32, "°C", "°F");
-const celsiusDegrees = 10;
-const fahrenheitDegrees = celsiusToFahrenheit.calculate(celsiusDegrees);
-console.log(`${celsiusDegrees} °C is equivalent to ${fahrenheitDegrees} °F`);
-
-const fahrenheitToCelsius = new AXplusB(5 / 9, -32 * (5 / 9), "°F", "°C");
-const fahrenheitDegrees2 = 50;
-const celsiusDegrees2 = fahrenheitToCelsius.calculate(fahrenheitDegrees2);
-console.log(`${fahrenheitDegrees2} °F is equivalent to ${celsiusDegrees2} °C`);
-
-class OhmsLaw implements CalculatingFunction {
-    constructor(protected resistance: number) {}
     calculate(voltage: number): number {
-        return voltage / this.resistance;
+        const current = voltage / this.resistance;
+        return voltage * current;
     }
+
     inputUnit(): string {
         return "V";
     }
-    outputUnit(): string {
-        return "A";
-    }
-    setResistance(resistance: number): void {
-        this.resistance = resistance;
-    }
-}
 
-const ohmsLawCalculator = new OhmsLaw(10);
-const voltage = 12; // Pinge 12 volti
-const current = ohmsLawCalculator.calculate(voltage);
-console.log(`Current: ${current} A`);
-
-const updatedResistance = 20;
-ohmsLawCalculator.setResistance(updatedResistance);
-const current2 = ohmsLawCalculator.calculate(voltage);
-console.log(`Current with updated resistance: ${current2} A`);
-
-class PowerCalculator implements CalculatingFunction {
-    constructor(protected resistance: number) {}
-    calculate(voltage: number): number {
-        return (voltage * voltage) / this.resistance;
-    }
-    inputUnit(): string {
-        return "V";
-    }
     outputUnit(): string {
         return "W";
     }
 }
 
-const powerCalculator = new PowerCalculator(10);
-const power = powerCalculator.calculate(voltage);
-console.log(`Power: ${power} W`);
+class Figure {
+    constructor(protected calculator: CalculatingFunction, protected g: CanvasRenderingContext2D) {
+        this.draw();
+    }
+    draw() {
+        this.g.clearRect(0, 0, this.g.canvas.width, this.g.canvas.height);
+
+        for (let i = 0; i < 25; i++) {
+            // Adjust the y-coordinate to draw from top to bottom
+            const y = this.g.canvas.height - 10 * this.calculator.calculate(i);
+            this.g.fillRect(10 * i, y, 3, 3);
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const kmPerHourToMPerSecCalculator = new KilometersPerHourToMetersPerSecond();
+    const speedInKmPerHour = 60; // Replace with your desired speed in km/h
+    const metersPerSecond = kmPerHourToMPerSecCalculator.calculate(speedInKmPerHour);
+
+    const canvas1 = document.getElementById("canvas1") as HTMLCanvasElement;
+    const context1 = canvas1.getContext("2d");
+
+    if (context1) {
+        const figure1 = new Figure(kmPerHourToMPerSecCalculator, context1);
+        figure1.draw(); // Draw the result on canvas1
+    } else {
+        console.error("Canvas rendering context is not available for canvas1.");
+    }
+
+
+    const resistancePowerCalculator = new ResistancePowerCalculator(100);
+    const voltage = 12; // Replace with your desired voltage in volts
+    const power = resistancePowerCalculator.calculate(voltage);
+
+    const canvas2 = document.getElementById("canvas2") as HTMLCanvasElement;
+    const context2 = canvas2.getContext("2d");
+
+    if (context2) {
+        const figure2 = new Figure(resistancePowerCalculator, context2);
+        figure2.draw(); // Draw the result on canvas2
+    } else {
+        console.error("Canvas rendering context is not available for canvas2.");
+    }
+});

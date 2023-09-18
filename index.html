@@ -1,24 +1,21 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit Converter</title>
+    <title>Canvas Drawing</title>
 </head>
 <body>
-<h1>Unit Converter</h1>
-<label for="inputValue">Enter Value:</label>
-<input type="number" id="inputValue">
-<select id="converterSelect">
-    <option value="inchesToCm">Inches to Centimeters</option>
-    <option value="cmToInches">Centimeters to Inches</option>
-    <option value="kmPerHourToMPerSec">Kilometers per Hour to Meters per Second</option>
-    <option value="mPerSecToKmPerHour">Meters per Second to Kilometers per Hour</option>
-</select>
-<button id="convertButton">Convert</button>
-<p>Result: <span id="result"></span></p>
-<p>Calculations Count: <span id="calculationCount">0</span></p>
+<h1>Canvas Drawing</h1>
+
+<!-- Canvas for kilometer per hour to meter per second -->
+<canvas id="canvas1" width="400" height="200"></canvas>
+<h2>Kilometers per Hour to Meters per Second</h2>
+
+<!-- Canvas for resistance power calculation -->
+<canvas id="canvas2" width="400" height="200"></canvas>
+<h2>Resistance Power Calculation</h2>
+
 <script src="index.js"></script>
 </body>
 </html>
